@@ -1,0 +1,44 @@
+# RetailIQ Platform - Backend dependencies (core, lightweight, reliable install)
+# For heavier/optional AI capabilities (higher-quality embeddings, real LLM-backed
+# CrewAI agents, advanced table extraction), see requirements-optional.txt.
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# Data & validation
+pydantic==2.10.4
+pydantic-settings==2.7.1
+email-validator==2.2.0
+PyYAML==6.0.2
+python-dotenv==1.0.1
+
+# Database / ORM
+SQLAlchemy==2.0.36
+
+# Auth / security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# RAG - vector store & PDF extraction (lightweight, no compiled/native deps)
+# NOTE: chromadb is intentionally NOT a hard dependency here - its
+# chroma-hnswlib dependency has no prebuilt wheel for Python 3.12 on Windows
+# and requires a C++ build toolchain. The app auto-detects chromadb if
+# installed (see requirements-optional.txt) and otherwise uses a built-in
+# NumPy-based vector store (app/services/vector_store.py) with an identical
+# interface, so RAG works out of the box either way.
+numpy==2.2.1
+pdfplumber==0.11.4
+PyMuPDF==1.25.1
+pytesseract==0.3.13
+Pillow==11.0.0
+
+# Documentation generation
+python-docx==1.1.2
+
+# Testing
+pytest==8.3.4
+pytest-cov==6.0.0
+httpx==0.28.1

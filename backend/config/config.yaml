@@ -1,0 +1,46 @@
+app:
+  name: "RetailIQ Platform"
+  version: "1.0.0"
+  environment: "development"
+  debug: true
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+
+database:
+  url: "sqlite:///./data/retailiq.db"
+  echo: false
+
+auth:
+  jwt_algorithm: "HS256"
+  access_token_expire_minutes: 60
+  refresh_token_expire_minutes: 1440
+
+rag:
+  enabled: true
+  vector_db: "chromadb"
+  persist_directory: "./data/chroma"
+  embedding_model: "BAAI/bge-base-en-v1.5"
+  fallback_embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  image_embedding_model: "openai/clip-vit-base-patch32"
+  chunk_size: 800
+  chunk_overlap: 100
+  top_k: 5
+
+ai_framework:
+  name: "CrewAI"
+  default_llm: "gpt-4o-mini"
+  temperature: 0.2
+  memory_enabled: true
+  retry: 3
+  max_iterations: 5
+
+logging:
+  level: "INFO"
+  file: "./logs/retailiq.log"
+  max_bytes: 5242880
+  backup_count: 5
+
+domain:
+  name: "Retail"

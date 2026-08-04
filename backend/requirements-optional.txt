@@ -1,0 +1,43 @@
+# Optional, heavier dependencies for production-grade AI capabilities.
+# Not required to run the platform - the app degrades gracefully without them.
+# Install with: pip install -r requirements-optional.txt
+
+# Production-grade vector database (default per spec). Pinned to a modern
+# release (>=1.x) which ships prebuilt wheels and no longer depends on the
+# chroma-hnswlib compiled extension that older 0.5.x releases required (that
+# older extension has no prebuilt wheel for cp312-win_amd64 and needed
+# Microsoft C++ Build Tools). Without this installed, the app uses a
+# built-in NumPy vector store instead.
+chromadb==1.5.9
+
+# Higher-quality semantic embeddings (BAAI/bge-base-en-v1.5). Pulls in PyTorch
+# (large download). Without this, RagService falls back to a lightweight
+# deterministic hashing embedding.
+sentence-transformers==3.3.1
+
+# Real LLM-backed CrewAI multi-agent execution. Requires GROQ_API_KEY (preferred,
+# fast + free tier) or OPENAI_API_KEY to be set in .env. Both providers are
+# supported out of the box via CrewAI's built-in LLM class (litellm) - no
+# separate provider SDK is needed. Without this installed, agent endpoints
+# return clearly-labeled deterministic template output instead.
+# NOTE: crewai's telemetry module imports pkg_resources, which newer setuptools
+# (>=81) no longer bundles - pin setuptools<81 alongside it.
+setuptools<81
+crewai==0.86.0
+
+# CLIP image embeddings for image-based retrieval.
+transformers==4.47.1
+torch==2.5.1
+
+# Advanced table extraction (requires a system Ghostscript installation).
+camelot-py[cv]==0.11.0
+
+# Custom internal MCP (Model Context Protocol) server - exposes core retail
+# operations (product search, inventory, orders, RAG assistant, SDLC agents)
+# as tools that MCP-compatible AI clients (Cursor, Claude Desktop, etc.) can
+# call directly against this backend's service layer. See backend/mcp_server/.
+# Pinned to the stable 1.x line: mcp 2.x requires starlette>=0.48, which
+# conflicts with the pinned fastapi==0.115.6 (requires starlette<0.42).
+# Installing this may upgrade pydantic to a newer 2.x patch release - verified
+# compatible with the existing FastAPI app and full test suite.
+mcp[cli]==1.29.0
