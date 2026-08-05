@@ -19,6 +19,33 @@ Seed the database once the backend container is up:
 docker compose exec backend python seed_data.py
 ```
 
+## Streamlit Community Cloud (Frontend Only)
+Streamlit Cloud hosts only the Streamlit process — the FastAPI backend must be
+deployed separately (Render/Railway/Fly.io/a VM, using `backend/Dockerfile`)
+and reachable over HTTPS first.
+
+1. Push to GitHub, then create an app at [share.streamlit.io](https://share.streamlit.io)
+   pointing at:
+   - Repository/branch: your repo / `main`
+   - Main file path: `frontend/streamlit_app/Home.py`
+2. In "Advanced settings" → Secrets, set:
+   ```toml
+   API_BASE_URL = "https://<your-hosted-backend-url>"
+   ```
+   (Cloud exposes top-level Secrets keys as `os.environ` too, so
+   `api_client.py`'s `os.getenv("API_BASE_URL", ...)` picks it up with no
+   code changes.)
+3. Dependencies: **Cloud only auto-installs a `requirements.txt` found at the
+   repo root or in the exact same directory as the entry-point file** — never
+   from an intermediate ancestor folder. Since the entry point is
+   `frontend/streamlit_app/Home.py` but the dependencies live in
+   `frontend/requirements.txt` (one level above that script's own directory),
+   Cloud would silently skip them, install bare Streamlit only, and crash
+   with `ModuleNotFoundError` (`dotenv`, `requests`, `pandas`, ...). The
+   root-level `requirements.txt` in this repo exists specifically to fix
+   that — keep it in sync with `frontend/requirements.txt` if you add new
+   frontend dependencies.
+
 ## Environment Variables (Production)
 Set these via your orchestrator's secret management (never commit `.env`):
 

@@ -6,9 +6,17 @@ from typing import Any
 
 import requests
 import streamlit as st
-from dotenv import load_dotenv
 
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    # python-dotenv is only needed to read a local .env file during local
+    # development. Deployed environments (Streamlit Community Cloud, Docker)
+    # supply config via real environment variables / secrets instead, so a
+    # missing dotenv package should never crash the app.
+    pass
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 

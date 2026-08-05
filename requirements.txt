@@ -1,0 +1,17 @@
+# Root-level requirements.txt for Streamlit Community Cloud deployments.
+#
+# Streamlit Cloud auto-discovers dependencies only from a requirements.txt in
+# the repo root or in the exact same directory as the app's entry-point file
+# (frontend/streamlit_app/Home.py) - NOT from an intermediate ancestor folder
+# like frontend/. Since this repo's frontend dependencies live in
+# frontend/requirements.txt, Cloud silently skipped them and only installed
+# bare Streamlit, causing `ModuleNotFoundError` for dotenv/requests/pandas.
+# This file mirrors frontend/requirements.txt so Cloud installs it correctly.
+#
+# For local development, keep using frontend/requirements.txt and
+# backend/requirements.txt directly - this file only matters for the
+# Streamlit Cloud deployment path.
+streamlit==1.41.1
+requests==2.32.3
+pandas==2.2.3
+python-dotenv==1.0.1
