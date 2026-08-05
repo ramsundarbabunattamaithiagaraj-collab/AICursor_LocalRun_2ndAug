@@ -1,0 +1,5 @@
+# Force LF line endings for files executed inside Linux containers,
+# regardless of the checkout platform (Windows Git defaults to CRLF, which
+# breaks '#!/bin/sh' shebangs with a "bad interpreter" error).
+*.sh text eol=lf
+Dockerfile text eol=lf
