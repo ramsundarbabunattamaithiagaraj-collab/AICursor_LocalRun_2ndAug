@@ -1,0 +1,25 @@
+name: Keep-alive ping
+
+# Prevents free-tier hosting (backend + Streamlit Cloud) from cold-starting
+# by periodically pinging their health endpoints. Configure the URLs as repo
+# variables (Settings -> Secrets and variables -> Actions -> Variables):
+#   BACKEND_HEALTH_URL   e.g. https://your-backend-host.example.com/health
+#   FRONTEND_URL         e.g. https://your-app.streamlit.app
+# Either variable can be left unset - its ping step is skipped automatically.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        if: vars.BACKEND_HEALTH_URL != ''
+        run: curl -fsS --max-time 30 "${{ vars.BACKEND_HEALTH_URL }}" || true
+
+      - name: Ping frontend
+        if: vars.FRONTEND_URL != ''
+        run: curl -fsS --max-time 30 "${{ vars.FRONTEND_URL }}" || true

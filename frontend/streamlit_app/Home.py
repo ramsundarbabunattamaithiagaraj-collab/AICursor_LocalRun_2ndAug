@@ -13,10 +13,15 @@ st.title("🛍️ RetailIQ Platform")
 st.caption("AI-powered retail operations platform - catalog, inventory, orders, RAG knowledge assistant, and multi-agent SDLC toolkit.")
 
 if not is_backend_reachable():
-    st.error(
-        "Cannot reach the backend API. Start it with:\n\n"
+    st.warning(
+        "Cannot reach the backend API right now. If it's hosted on a free-tier "
+        "service, it may be **cold-starting after a period of inactivity** - "
+        "this can take up to a minute. Locally, start it with:\n\n"
         "`uvicorn app.main:app --reload` (from the `backend` folder)."
     )
+    if st.button("🔄 Retry"):
+        is_backend_reachable.clear()
+        st.rerun()
 else:
     st.success("Backend API is reachable.")
 

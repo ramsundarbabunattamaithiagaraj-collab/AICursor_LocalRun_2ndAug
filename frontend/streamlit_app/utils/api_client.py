@@ -77,9 +77,19 @@ def api_delete(path: str) -> Any:
     return _handle_response(response)
 
 
+@st.cache_data(ttl=15, show_spinner=False)
 def is_backend_reachable() -> bool:
+    """Checks backend health, cached for a short window.
+
+    Streamlit re-runs the entire script on every widget interaction, so an
+    uncached network call here would hit the backend on every single rerun -
+    a major contributor to sluggishness, especially against a backend host
+    that has a cold-start delay (e.g. a free-tier service waking from sleep).
+    A short TTL keeps the app responsive between page interactions while
+    still detecting backend recovery within ~15 seconds.
+    """
     try:
-        requests.get(f"{API_BASE_URL}/health", timeout=3)
+        requests.get(f"{API_BASE_URL}/health", timeout=5)
         return True
     except requests.exceptions.RequestException:
         return False

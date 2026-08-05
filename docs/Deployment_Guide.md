@@ -45,6 +45,33 @@ and reachable over HTTPS first.
    root-level `requirements.txt` in this repo exists specifically to fix
    that — keep it in sync with `frontend/requirements.txt` if you add new
    frontend dependencies.
+4. Python version: the root-level `runtime.txt` (`python-3.12`) pins Cloud to
+   a well-supported interpreter. Without it, Cloud may default to a very new
+   Python release for which packages like `pandas`/`numpy` have no prebuilt
+   wheel yet, forcing a slow (multi-minute, sometimes failing) source build
+   on every fresh deploy.
+
+### Why the app feels slow to load
+- **First deploy / after a dependency change**: Cloud has to `pip install`
+  from scratch — normal, one-time, a few minutes. Subsequent visits reuse the
+  cached environment and start almost instantly.
+- **App put to sleep from inactivity**: free Community Cloud apps sleep after
+  a period with no visitors; the next visit triggers a ~30-60s wake-up. This
+  is a one-time cost per sleep cycle, not a persistent slowdown.
+- **Backend cold start (most common cause)**: if the FastAPI backend is on a
+  free tier (e.g. Render's free plan), it also sleeps after ~15 minutes idle
+  and takes 30-60s to wake on the next request. `Home.py`'s health check
+  (`is_backend_reachable`, cached for 15s to avoid hammering the backend on
+  every Streamlit rerun) will show a "cold-starting" warning with a Retry
+  button in this case rather than hanging silently.
+- **Fix**: keep the backend (and optionally the Streamlit app) warm with a
+  scheduled ping. This repo includes a ready-to-use
+  [`.github/workflows/keep-alive.yml`](../.github/workflows/keep-alive.yml)
+  that pings both every 10 minutes for free — just set the `BACKEND_HEALTH_URL`
+  and/or `FRONTEND_URL` repo variables (Settings → Secrets and variables →
+  Actions → Variables) to your deployed URLs. Alternatively use an external
+  scheduler like [cron-job.org](https://cron-job.org)/UptimeRobot, or upgrade
+  to an always-on paid tier if consistent low latency matters.
 
 ## Environment Variables (Production)
 Set these via your orchestrator's secret management (never commit `.env`):
